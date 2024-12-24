@@ -211,7 +211,7 @@ class ProjectMember(BaseModel):
         verbose_name=_('Role')
     )
     join_date = models.DateField(
-        auto_now_add=True,
+        default=timezone.now,
         verbose_name=_('Join Date')
     )
     end_date = models.DateField(
@@ -432,7 +432,6 @@ class TimeEntry(BaseModel):
 
     @property
     def billable_amount(self):
-        """Calculate the billable amount for this time entry"""
         if not self.billable:
             return Decimal('0.00')
         rate = self.get_effective_billing_rate

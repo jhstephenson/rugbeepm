@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0">Projects</h1>
+        <p class="text-muted">Manage your projects and track progress</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'project:project_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>New Project
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search projects..." value="{{ request.GET.search }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for status in status_choices %}
+                    <option value="{{ status.code }}" {% if request.GET.status == status.code %}selected{% endif %}>
+                        {{ status.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="client" class="form-select">
+                    <option value="">All Clients</option>
+                    {% for client in clients %}
+                    <option value="{{ client.pk }}" {% if request.GET.client == client.pk|stringformat:"i" %}selected{% endif %}>
+                        {{ client.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-secondary w-100">Filter</button>
+            </div>
+            {% if request.GET %}
+            <div class="col-12">
+                <a href="{% url 'project:project_list' %}" class="btn btn-outline-secondary">Clear Filters</a>
+            </div>
+            {% endif %}
+        </form>
+
+        {% if projects %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Client</th>
+                        <th>Status</th>
+                        <th>Manager</th>
+                        <th>Progress</th>
+                        <th>Budget</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'project:project_detail' project.pk %}">
+                                {{ project.name }}
+                            </a>
+                            <br>
+                            <small class="text-muted">{{ project.code }}</small>
+                        </td>
+                        <td>
+                            <a href="{% url 'project:client_detail' project.client.pk %}">
+                                {{ project.client.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ project.status.code|lower }}">
+                                {{ project.status.name }}
+                            </span>
+                        </td>
+                        <td>{{ project.manager.get_full_name }}</td>
+                        <td>
+                            {% with completed=project.tasks.filter.count total=project.tasks.count %}
+                            {% if total > 0 %}
+                            {% widthratio completed total 100 as progress %}
+                            <div class="progress" style="height: 5px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ progress }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ progress }}%</small>
+                            {% else %}
+                            <small class="text-muted">No tasks</small>
+                            {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            <div>${{ project.budget_amount|intcomma }}</div>
+                            <small class="text-muted">${{ project.billing_rate }}/hr</small>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'project:project_detail' project.pk %}" 
+                               class="btn btn-sm">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'project:project_edit' project.pk %}" 
+                               class="btn btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'project:project_task_create' project.pk %}" 
+                               class="btn btn-sm">
+                                <i class="bi bi-plus-circle"></i> Task
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.client %}&client={{ request.GET.client }}{% endif %}">
+                        Previous
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.client %}&client={{ request.GET.client }}{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.client %}&client={{ request.GET.client }}{% endif %}">
+                        Next
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-folder display-1 text-muted"></i>
+            <p class="lead mt-3">No projects found</p>
+            <p class="text-muted">Get started by creating your first project</p>
+            <a href="{% url 'project:project_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Add Project
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

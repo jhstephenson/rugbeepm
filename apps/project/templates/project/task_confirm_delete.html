@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Task{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="h3 mb-4">Delete Task</h1>
+                
+                <p class="text-danger">
+                    Are you sure you want to delete the task "{{ object.name }}"?
+                    This action cannot be undone.
+                </p>
+
+                <p class="text-muted">
+                    This will delete all associated time entries.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>Delete Task
+                        </button>
+                        <a href="{% url 'project:task_detail' object.id %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

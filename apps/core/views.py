@@ -8,6 +8,7 @@ from django.contrib.auth import logout
 from django.contrib.auth import views as auth_views
 from django.utils.translation import gettext_lazy as _
 from .models import LookupCategory, LookupValue, CustomUser, UserProfile
+from apps.project.models import Project, Task, TimeEntry
 from .forms import CategoryForm, ValueForm, UserProfileForm
 
 

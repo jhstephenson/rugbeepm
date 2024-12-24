@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Time Entry{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="h3 mb-4">Delete Time Entry</h1>
+                
+                <p class="text-danger">
+                    Are you sure you want to delete this time entry?
+                    This action cannot be undone.
+                </p>
+
+                <div class="mb-4">
+                    <strong>Task:</strong> {{ object.task.name }}<br>
+                    <strong>Hours:</strong> {{ object.hours }}<br>
+                    <strong>Date:</strong> {{ object.date|date:"F j, Y" }}<br>
+                    <strong>Description:</strong> {{ object.description|default:"-" }}
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>Delete Time Entry
+                        </button>
+                        <a href="{% url 'project:task_detail' object.task.id %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

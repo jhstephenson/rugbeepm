@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} - Category Details{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0">{{ category.name }}</h1>
+        <p class="text-muted">{{ category.description|default:"No description" }}</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'project:category_edit' category.id %}" class="btn btn-primary">
+            <i class="bi bi-pencil me-1"></i>Edit Category
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Category Values</h5>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addValueModal">
+                    <i class="bi bi-plus-circle me-1"></i>Add Value
+                </button>
+            </div>
+            <div class="card-body">
+                {% if values %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Label</th>
+                                <th>Description</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for value in values %}
+                            <tr>
+                                <td><code>{{ value.code }}</code></td>
+                                <td>{{ value.label }}</td>
+                                <td>{{ value.description|default:"-" }}</td>
+                                <td>{{ value.order }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#editValueModal{{ value.id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted mb-0">No values found for this category</p>
+                    <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addValueModal">
+                        <i class="bi bi-plus-circle me-1"></i>Add First Value
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Value Modal -->
+<div class="modal fade" id="addValueModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Value</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'project:category_value_create' category.id %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="code" class="form-label">Code</label>
+                        <input type="text" class="form-control" id="code" name="code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="label" class="form-label">Label</label>
+                        <input type="text" class="form-control" id="label" name="label" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="order" class="form-label">Order</label>
+                        <input type="number" class="form-control" id="order" name="order" value="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Value</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Value Modals -->
+{% for value in values %}
+<div class="modal fade" id="editValueModal{{ value.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Value</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'project:category_value_edit' category.id value.id %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="code{{ value.id }}" class="form-label">Code</label>
+                        <input type="text" class="form-control" id="code{{ value.id }}" name="code" value="{{ value.code }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="label{{ value.id }}" class="form-label">Label</label>
+                        <input type="text" class="form-control" id="label{{ value.id }}" name="label" value="{{ value.label }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description{{ value.id }}" class="form-label">Description</label>
+                        <textarea class="form-control" id="description{{ value.id }}" name="description" rows="3">{{ value.description }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="order{{ value.id }}" class="form-label">Order</label>
+                        <input type="number" class="form-control" id="order{{ value.id }}" name="order" value="{{ value.order }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

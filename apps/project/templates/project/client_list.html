@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Clients{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0">Clients</h1>
+        <p class="text-muted">Manage your client organizations</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'project:client_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>New Client
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search clients..." value="{{ request.GET.search }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-secondary">Search</button>
+                {% if request.GET.search %}
+                <a href="{% url 'project:client_list' %}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+
+        {% if clients %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Industry</th>
+                        <th>Primary Contact</th>
+                        <th>Active Projects</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'project:client_detail' client.pk %}">
+                                {{ client.name }}
+                            </a>
+                        </td>
+                        <td>{{ client.code }}</td>
+                        <td>{{ client.industry.name }}</td>
+                        <td>
+                            <div>{{ client.primary_contact_name }}</div>
+                            <small class="text-muted">{{ client.primary_contact_email }}</small>
+                        </td>
+                        <td>{{ client.projects.filter.count }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'project:client_detail' client.pk %}" 
+                               class="btn btn-sm">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'project:client_edit' client.pk %}" 
+                               class="btn btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'project:project_create' %}?client={{ client.pk }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus-circle"></i> Project
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        Previous
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        Next
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-building display-1 text-muted"></i>
+            <p class="lead mt-3">No clients found</p>
+            <p class="text-muted">Get started by adding your first client</p>
+            <a href="{% url 'project:client_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Add Client
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

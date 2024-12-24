@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}New{% endif %} Time Entry{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0">{% if form.instance.pk %}Edit{% else %}New{% endif %} Time Entry</h1>
+        <p class="text-muted">{% if form.instance.pk %}Update time entry details{% else %}Log your time{% endif %}</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% if form.instance.pk %}{% url 'project:task_detail' form.instance.task.pk %}{% else %}{% url 'project:task_list' %}{% endif %}" 
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to {% if form.instance.pk %}Task{% else %}Tasks{% endif %}
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}Save Changes{% else %}Log Time{% endif %}
+                        </button>
+                        <a href="{% if form.instance.pk %}{% url 'project:task_detail' form.instance.task.pk %}{% else %}{% url 'project:task_list' %}{% endif %}" 
+                           class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

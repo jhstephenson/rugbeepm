@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0">{{ project.name }}</h1>
+        <p class="text-muted">
+            Client: <a href="{% url 'project:client_detail' project.client.pk %}">{{ project.client.name }}</a>
+        </p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'project:project_task_create' project.pk %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>New Task
+        </a>
+        <a href="{% url 'project:project_edit' project.id %}" class="btn btn-secondary">
+            <i class="bi bi-pencil me-1"></i>Edit Project
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Project Info -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Project Information</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Code</dt>
+                    <dd class="col-sm-8">{{ project.code }}</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-{{ project.status.code|lower }}">
+                            {{ project.status.name }}
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-4">Priority</dt>
+                    <dd class="col-sm-8">{{ project.priority.name }}</dd>
+
+                    <dt class="col-sm-4">Manager</dt>
+                    <dd class="col-sm-8">{{ project.manager.get_full_name }}</dd>
+
+                    <dt class="col-sm-4">Timeline</dt>
+                    <dd class="col-sm-8">
+                        {{ project.start_date|date:"M j, Y" }} - 
+                        {{ project.end_date|date:"M j, Y"|default:"Ongoing" }}
+                    </dd>
+
+                    <dt class="col-sm-4">Budget</dt>
+                    <dd class="col-sm-8">
+                        ${{ project.budget_amount|intcomma }}<br>
+                        <small class="text-muted">Rate: ${{ project.billing_rate }}/hr</small>
+                    </dd>
+
+                    <dt class="col-sm-4">Hours</dt>
+                    <dd class="col-sm-8">
+                        {{ project.estimated_hours|floatformat:1 }} estimated<br>
+                        <small class="text-muted">
+                            {{ project.actual_hours|default:0|floatformat:1 }} logged
+                        </small>
+                    </dd>
+
+                    {% if project.description %}
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">{{ project.description|linebreaks }}</dd>
+                    {% endif %}
+
+                    {% if project.notes %}
+                    <dt class="col-sm-4">Notes</dt>
+                    <dd class="col-sm-8">{{ project.notes|linebreaks }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Members -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Team Members</h5>
+                <a href="{% url 'project:project_member_add' project.pk %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Add Member
+                </a>
+            </div>
+            <div class="card-body">
+                {% if team_members %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Role</th>
+                                <th>Join Date</th>
+                                <th>Billing Rate</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in team_members %}
+                            <tr>
+                                <td>{{ member.user.get_full_name }}</td>
+                                <td>{{ member.role.name }}</td>
+                                <td>{{ member.join_date|date:"M j, Y" }}</td>
+                                <td>${{ member.billing_rate|default:project.billing_rate }}/hr</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-person-dash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No team members assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tasks -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Tasks</h5>
+                <a href="{% url 'project:project_task_create' project.pk %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Add Task
+                </a>
+            </div>
+            <div class="card-body">
+                {% if tasks %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Assigned To</th>
+                                <th>Due Date</th>
+                                <th>Progress</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'project:task_detail' task.pk %}">
+                                        {{ task.title }}
+                                    </a>
+                                    {% if task.subtasks.exists %}
+                                    <br>
+                                    <small class="text-muted">
+                                        {{ task.subtasks.count }} subtask{{ task.subtasks.count|pluralize }}
+                                    </small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ task.status.code|lower }}">
+                                        {{ task.status.name }}
+                                    </span>
+                                </td>
+                                <td>{{ task.priority.name }}</td>
+                                <td>{{ task.assigned_to.get_full_name }}</td>
+                                <td>{{ task.due_date|date:"M j, Y" }}</td>
+                                <td>
+                                    {% with completed=task.subtasks.filter.count total=task.subtasks.count %}
+                                    {% if total > 0 %}
+                                    {% widthratio completed total 100 as progress %}
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: {{ progress }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ progress }}%</small>
+                                    {% else %}
+                                    <small class="text-muted">No subtasks</small>
+                                    {% endif %}
+                                    {% endwith %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'project:task_edit' task.pk %}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'project:task_timeentry_create' task.pk %}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-clock"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No tasks created yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Time Entries -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Recent Time Entries</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_time_entries %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Task</th>
+                                <th>Hours</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in recent_time_entries %}
+                            <tr>
+                                <td>{{ entry.date|date:"M j, Y" }}</td>
+                                <td>{{ entry.user.get_full_name }}</td>
+                                <td>
+                                    <a href="{% url 'project:task_detail' entry.task.pk %}">
+                                        {{ entry.task.title }}
+                                    </a>
+                                </td>
+                                <td>{{ entry.hours|floatformat:1 }}</td>
+                                <td>{{ entry.description|truncatewords:10 }}</td>
+                                <td>
+                                    {% if entry.user == request.user %}
+                                    <a href="{% url 'project:timeentry_edit' entry.pk %}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No time entries recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal fade" id="addMemberModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Team Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'project:project_member_add' project.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">User</label>
+                        <select name="user" class="form-select" required>
+                            <option value="">Select User</option>
+                            {% for user in available_users %}
+                            <option value="{{ user.pk }}">{{ user.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select name="role" class="form-select" required>
+                            <option value="">Select Role</option>
+                            {% for role in project_roles %}
+                            <option value="{{ role.pk }}">{{ role.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Billing Rate (optional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" name="billing_rate" class="form-control" 
+                                   step="0.01" min="0" placeholder="Project default">
+                            <span class="input-group-text">/hr</span>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Member</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

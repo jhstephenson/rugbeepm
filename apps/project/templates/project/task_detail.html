@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0">{{ task.title }}</h1>
+        <p class="text-muted">
+            Project: <a href="{% url 'project:project_detail' task.project.pk %}">{{ task.project.name }}</a>
+            {% if task.parent_task %}
+            <br>Parent: <a href="{% url 'project:task_detail' task.parent_task.pk %}">{{ task.parent_task.title }}</a>
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'project:task_timeentry_create' task.pk %}" class="btn btn-primary">
+            <i class="bi bi-clock me-1"></i>Log Time
+        </a>
+        <a href="{% url 'project:task_edit' task.pk %}" class="btn btn-secondary">
+            <i class="bi bi-pencil me-1"></i>Edit Task
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Task Info -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Task Information</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-{{ task.status.code|lower }}">
+                            {{ task.status.name }}
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-4">Priority</dt>
+                    <dd class="col-sm-8">{{ task.priority.name }}</dd>
+
+                    <dt class="col-sm-4">Assigned To</dt>
+                    <dd class="col-sm-8">{{ task.assigned_to.get_full_name }}</dd>
+
+                    <dt class="col-sm-4">Due Date</dt>
+                    <dd class="col-sm-8">{{ task.due_date|date:"M j, Y" }}</dd>
+
+                    <dt class="col-sm-4">Hours</dt>
+                    <dd class="col-sm-8">
+                        {{ task.estimated_hours|floatformat:1 }} estimated<br>
+                        <small class="text-muted">
+                            {{ task.actual_hours|default:0|floatformat:1 }} logged
+                        </small>
+                    </dd>
+
+                    <dt class="col-sm-4">Billing</dt>
+                    <dd class="col-sm-8">
+                        {% if task.billable %}
+                        ${{ task.billing_rate }}/hr
+                        {% else %}
+                        Non-billable
+                        {% endif %}
+                    </dd>
+
+                    {% if task.description %}
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">{{ task.description|linebreaks }}</dd>
+                    {% endif %}
+
+                    {% if task.notes %}
+                    <dt class="col-sm-4">Notes</dt>
+                    <dd class="col-sm-8">{{ task.notes|linebreaks }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subtasks -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Subtasks</h5>
+                <a href="{% url 'project:task_create' %}?parent={{ task.pk }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Add Subtask
+                </a>
+            </div>
+            <div class="card-body">
+                {% if subtasks %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Assigned To</th>
+                                <th>Due Date</th>
+                                <th>Hours</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subtask in subtasks %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'project:task_detail' subtask.pk %}">
+                                        {{ subtask.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ subtask.status.code|lower }}">
+                                        {{ subtask.status.name }}
+                                    </span>
+                                </td>
+                                <td>{{ subtask.priority.name }}</td>
+                                <td>{{ subtask.assigned_to.get_full_name }}</td>
+                                <td>{{ subtask.due_date|date:"M j, Y" }}</td>
+                                <td>
+                                    {{ subtask.estimated_hours|floatformat:1 }} est<br>
+                                    <small class="text-muted">
+                                        {{ subtask.actual_hours|default:0|floatformat:1 }} logged
+                                    </small>
+                                </td>
+                                <td>
+                                    <a href="{% url 'project:task_edit' subtask.pk %}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'project:task_timeentry_create' subtask.pk %}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-clock"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No subtasks created yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Entries -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Time Entries</h5>
+            </div>
+            <div class="card-body">
+                {% if time_entries %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Hours</th>
+                                <th>Description</th>
+                                <th>Billing Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in time_entries %}
+                            <tr>
+                                <td>{{ entry.date|date:"M j, Y" }}</td>
+                                <td>{{ entry.user.get_full_name }}</td>
+                                <td>{{ entry.hours|floatformat:1 }}</td>
+                                <td>{{ entry.description|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-{{ entry.billing_status.code|lower }}">
+                                        {{ entry.billing_status.name }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if entry.user == request.user %}
+                                    <a href="{% url 'project:timeentry_edit' entry.id %}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No time entries recorded yet.</p>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <h6 class="mb-3">Quick Time Entry</h6>
+                <form method="post" action="{% url 'project:task_timeentry_create' task.pk %}">
+                    {% csrf_token %}
+                    {{ time_entry_form|crispy }}
+                    <button type="submit" class="btn btn-primary">Log Time</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

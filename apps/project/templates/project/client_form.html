@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}New{% endif %} Client{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0">{% if form.instance.pk %}Edit{% else %}New{% endif %} Client</h1>
+        <p class="text-muted">{% if form.instance.pk %}Update client details{% else %}Create a new client{% endif %}</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'project:client_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to Clients
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}Save Changes{% else %}Create Client{% endif %}
+                        </button>
+                        <a href="{% if form.instance.pk %}{% url 'project:client_detail' form.instance.pk %}{% else %}{% url 'project:client_list' %}{% endif %}" 
+                           class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

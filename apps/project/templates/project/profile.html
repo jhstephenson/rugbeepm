@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="h3 mb-4">Profile</h1>
+                
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <h5 class="mb-3">Personal Information</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            {{ form.first_name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.last_name|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.phone_number|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3">Address</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            {{ form.address_line1|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            {{ form.address_line2|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            {{ form.city|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.state|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            {{ form.postal_code|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.country|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3">Additional Information</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            {{ form.bio|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            {{ form.birth_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.avatar|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i>Save Changes
+                        </button>
+                        <a href="{% url 'password_change' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-key me-1"></i>Change Password
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0">Welcome, {{ user.get_full_name|default:user.username }}</h1>
+        <p class="text-muted">Here's an overview of your projects and tasks</p>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'project:project_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>New Project
+        </a>
+        <a href="{% url 'project:task_create' %}" class="btn btn-secondary">
+            <i class="bi bi-plus-circle me-1"></i>New Task
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Summary Cards -->
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Active Projects</h6>
+                <h2 class="card-title mb-0">{{ active_projects }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">My Tasks</h6>
+                <h2 class="card-title mb-0">{{ my_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Unbilled Hours</h6>
+                <h2 class="card-title mb-0">{{ unbilled_hours|floatformat:1 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Today's Date</h6>
+                <h2 class="card-title mb-0">{{ today|date:"M j" }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Time Entries -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Recent Time Entries</h5>
+                <a href="{% url 'project:timeentry_create' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Add Time
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_time_entries %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Project</th>
+                                <th>Task</th>
+                                <th>Hours</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in recent_time_entries %}
+                            <tr>
+                                <td>{{ entry.date|date:"M j, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'project:project_detail' entry.task.project.pk %}">
+                                        {{ entry.task.project.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'project:task_detail' entry.task.pk %}">
+                                        {{ entry.task.title }}
+                                    </a>
+                                </td>
+                                <td>{{ entry.hours|floatformat:1 }}</td>
+                                <td>
+                                    <a href="{% url 'project:timeentry_edit' entry.pk %}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No recent time entries found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
