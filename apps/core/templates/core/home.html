@@ -1,19 +1,54 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
+<div class="px-4 py-5 my-5 text-center">
+    <img class="d-block mx-auto mb-4" src="{% static 'images/logo.png' %}" alt="RugbeePM Logo" width="72" height="72">
+    <h1 class="display-5 fw-bold text-body-emphasis mb-3">Welcome to RugbeePM</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">A modern project management system designed for agile teams. Streamline your workflow, collaborate effectively, and deliver projects successfully.</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'core:get-started' %}" class="btn btn-primary btn-lg px-4 gap-3">Get Started</a>
+            <a href="{% url 'core:about' %}" class="btn btn-outline-secondary btn-lg px-4">Learn More</a>
+        </div>
+    </div>
+</div>
+
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <h1 class="display-4 mb-4">Welcome to RugbeePM</h1>
-            <p class="lead">Your Project Management Solution</p>
-            <hr class="my-4">
-            <p>Manage your projects efficiently and effectively with RugbeePM.</p>
-            <div class="mt-4">
-                <a href="#" class="btn btn-primary btn-lg me-2">Get Started</a>
-                <a href="#" class="btn btn-outline-secondary btn-lg">Learn More</a>
+    <div class="row g-4 py-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-3">
+                        <i class="fas fa-tasks text-primary"></i>
+                    </div>
+                    <h3 class="card-title h5">Project Management</h3>
+                    <p class="card-text">Create and manage projects with ease. Set milestones, track progress, and achieve your goals.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-3">
+                        <i class="fas fa-users text-primary"></i>
+                    </div>
+                    <h3 class="card-title h5">Team Collaboration</h3>
+                    <p class="card-text">Work together seamlessly with your team. Share updates, assign tasks, and stay in sync.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-3">
+                        <i class="fas fa-chart-line text-primary"></i>
+                    </div>
+                    <h3 class="card-title h5">Progress Tracking</h3>
+                    <p class="card-text">Monitor project progress in real-time. Get insights and make data-driven decisions.</p>
+                </div>
             </div>
         </div>
     </div>

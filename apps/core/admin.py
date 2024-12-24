@@ -13,52 +13,21 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(LookupCategory)
 class LookupCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'is_system', 'is_active')
-    search_fields = ('name', 'code', 'description')
+    list_display = ('name', 'code', 'is_system', 'is_active', 'created_date')
     list_filter = ('is_system', 'is_active')
-    readonly_fields = ('id', 'created_date', 'updated_date', 'created_by', 'updated_by')
-    fieldsets = (
-        (None, {
-            'fields': ('name', 'code', 'description')
-        }),
-        ('System Settings', {
-            'fields': ('is_system', 'is_active'),
-            'classes': ('collapse',)
-        }),
-        ('Audit', {
-            'fields': ('id', 'created_date', 'updated_date', 'created_by', 'updated_by'),
-            'classes': ('collapse',)
-        }),
-    )
+    search_fields = ('name', 'code', 'description')
+    readonly_fields = ('created_date', 'updated_date')
+    ordering = ('name',)
 
 
 @admin.register(LookupValue)
 class LookupValueAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'code', 'sort_order', 'is_default', 'is_system', 'is_active')
-    list_filter = ('category', 'is_default', 'is_system', 'is_active')
-    search_fields = ('name', 'code', 'description', 'category__name')
-    readonly_fields = ('id', 'created_date', 'updated_date', 'created_by', 'updated_by')
-    list_select_related = ('category',)
-    fieldsets = (
-        (None, {
-            'fields': ('category', 'name', 'code', 'description')
-        }),
-        ('Display Options', {
-            'fields': ('sort_order', 'color', 'icon')
-        }),
-        ('Hierarchy', {
-            'fields': ('parent',),
-            'classes': ('collapse',)
-        }),
-        ('System Settings', {
-            'fields': ('is_default', 'is_system', 'is_active'),
-            'classes': ('collapse',)
-        }),
-        ('Audit', {
-            'fields': ('id', 'created_date', 'updated_date', 'created_by', 'updated_by'),
-            'classes': ('collapse',)
-        }),
-    )
+    list_display = ('name', 'category', 'code', 'sort_order', 'is_active')
+    list_filter = ('category', 'is_active')
+    search_fields = ('name', 'code', 'description')
+    raw_id_fields = ('category', 'parent')
+    readonly_fields = ('created_date', 'updated_date', 'created_by', 'updated_by')
+    ordering = ('category', 'sort_order', 'name')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "parent":

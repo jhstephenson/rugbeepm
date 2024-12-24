@@ -27,7 +27,7 @@
                 {% for category in categories %}
                     <tr>
                         <td>
-                            <a href="{% url 'core:category-detail' category.pk %}" class="text-decoration-none">
+                            <a href="{% url 'core:category-detail' category.id %}" class="text-decoration-none">
                                 {{ category.name }}
                             </a>
                         </td>
@@ -40,13 +40,13 @@
                         </td>
                         <td class="text-end">
                             <div class="d-flex gap-2 justify-content-end">
-                                <a href="{% url 'core:category-detail' category.pk %}" class="btn btn-sm text-primary" title="View Details">
+                                <a href="{% url 'core:category-detail' category.id %}" class="btn btn-sm text-primary" title="View Details">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{% url 'core:category-update' category.pk %}" class="btn btn-sm text-secondary" title="Edit Category">
+                                <a href="{% url 'core:category-update' category.id %}" class="btn btn-sm text-secondary" title="Edit Category">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{% url 'core:category-delete' category.pk %}" class="btn btn-sm text-danger" title="Delete Category">
+                                <a href="{% url 'core:category-delete' category.id %}" class="btn btn-sm text-danger" title="Delete Category">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>

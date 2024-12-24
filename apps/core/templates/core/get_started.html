@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Get Started{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">Getting Started with RugbeePM</h1>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">1. Set Up Your Profile</h2>
+                    <p>Start by setting up your profile with your personal information and preferences:</p>
+                    <ul>
+                        <li>Upload a profile picture</li>
+                        <li>Add your contact information</li>
+                        <li>Set your notification preferences</li>
+                    </ul>
+                    <a href="{% url 'core:profile_edit' %}" class="btn btn-primary">Update Profile</a>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">2. Understanding Projects</h2>
+                    <p>Projects are the core of RugbeePM. Each project can contain:</p>
+                    <ul>
+                        <li>Tasks and subtasks</li>
+                        <li>Team members and their roles</li>
+                        <li>Project documentation</li>
+                        <li>Milestones and deadlines</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline-primary">View Sample Project</a>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">3. Managing Tasks</h2>
+                    <p>Tasks help you break down projects into manageable pieces:</p>
+                    <ul>
+                        <li>Create and assign tasks</li>
+                        <li>Set priorities and due dates</li>
+                        <li>Track progress and status</li>
+                        <li>Collaborate with team members</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">4. Team Collaboration</h2>
+                    <p>Work effectively with your team:</p>
+                    <ul>
+                        <li>Invite team members</li>
+                        <li>Assign roles and permissions</li>
+                        <li>Share updates and comments</li>
+                        <li>Track team activity</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">Need Help?</h2>
+                    <p>If you need assistance or have questions, we're here to help:</p>
+                    <ul>
+                        <li>Check our <a href="#">documentation</a></li>
+                        <li>Contact <a href="#">support</a></li>
+                        <li>Join our <a href="#">community forum</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

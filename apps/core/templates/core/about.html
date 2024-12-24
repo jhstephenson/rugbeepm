@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">About RugbeePM</h1>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">What is RugbeePM?</h2>
+                    <p>RugbeePM is a modern, intuitive project management system designed to help teams collaborate effectively and deliver projects successfully. Our platform combines powerful features with a user-friendly interface to make project management simple and efficient.</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">Key Features</h2>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-tasks fa-2x text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h3 class="h5">Project Management</h3>
+                                    <p class="mb-0">Create, organize, and track projects with ease. Set milestones, deadlines, and priorities.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-users fa-2x text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h3 class="h5">Team Collaboration</h3>
+                                    <p class="mb-0">Work together seamlessly with team members, share updates, and track progress.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-chart-line fa-2x text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h3 class="h5">Progress Tracking</h3>
+                                    <p class="mb-0">Monitor project progress, identify bottlenecks, and make data-driven decisions.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-file-alt fa-2x text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h3 class="h5">Documentation</h3>
+                                    <p class="mb-0">Keep all project documentation organized and easily accessible.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">Why Choose RugbeePM?</h2>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>User-Friendly:</strong> Intuitive interface that's easy to learn and use
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>Flexible:</strong> Adaptable to different project management methodologies
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>Scalable:</strong> Grows with your team and project needs
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>Secure:</strong> Built with security and data privacy in mind
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="h4 mb-3">Ready to Get Started?</h2>
+                    <p class="mb-4">Join thousands of teams already using RugbeePM to manage their projects effectively.</p>
+                    <div class="d-grid gap-2 d-md-block">
+                        <a href="{% url 'core:get-started' %}" class="btn btn-primary me-md-2">Get Started</a>
+                        <a href="#" class="btn btn-outline-primary">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

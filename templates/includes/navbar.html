@@ -15,6 +15,12 @@
                <li class="nav-item">
                    <a class="nav-link" href="{% url 'core:home' %}">Home</a>
                </li>
+               <li class="nav-item">
+                   <a class="nav-link" href="{% url 'core:about' %}">About</a>
+               </li>
+               <li class="nav-item">
+                   <a class="nav-link" href="{% url 'core:get-started' %}">Get Started</a>
+               </li>
            </ul>
            
            <ul class="navbar-nav">
@@ -25,7 +31,7 @@
                        </a>
                        <ul class="dropdown-menu dropdown-menu-end">
                            <li>
-                               <a class="dropdown-item" href="#">
+                               <a class="dropdown-item" href="{% url 'core:profile' %}">
                                    <i class="fas fa-user me-2"></i>Profile
                                </a>
                            </li>
@@ -43,11 +49,20 @@
                            {% endif %}
                            <li><hr class="dropdown-divider"></li>
                            <li>
-                               <a class="dropdown-item" href="{% url 'admin:logout' %}">
-                                   <i class="fas fa-sign-out-alt me-2"></i>Logout
-                               </a>
+                               <form method="post" action="{% url 'core:logout' %}" class="dropdown-item p-0">
+                                   {% csrf_token %}
+                                   <button type="submit" class="dropdown-item">
+                                       <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                   </button>
+                               </form>
                            </li>
                        </ul>
+                   </li>
+               {% else %}
+                   <li class="nav-item">
+                       <a class="nav-link" href="{% url 'core:login' %}">
+                           <i class="fas fa-sign-in-alt me-2"></i>Login
+                       </a>
                    </li>
                {% endif %}
            </ul>

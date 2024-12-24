@@ -20,14 +20,7 @@ class BaseModel(models.Model):
         notes (TextField): Optional notes about the object
         metadata (JSONField): Flexible field for additional data
     """
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        verbose_name=_('ID'),
-        help_text=_('Unique identifier for this object')
-    )
-    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_('Created Date'),
@@ -79,22 +72,11 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['-created_date']
-        get_latest_by = 'created_date'
-
-    def __str__(self):
-        """Default string representation using the ID."""
-        return str(self.id)
 
     def save(self, *args, **kwargs):
-        """
-        Override save method to perform common operations:
-        - Ensure metadata is a dict
-        - Clean fields before saving
-        """
+        # Ensure metadata is a dict
         if self.metadata is None:
             self.metadata = {}
-        self.full_clean()
         super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
@@ -153,9 +135,11 @@ class CustomUser(AbstractUser):
         help_text=_('Additional data stored as JSON')
     )
 
+
     class Meta(AbstractUser.Meta):
         ordering = ['-date_joined']
         get_latest_by = 'date_joined'
+
 
     def save(self, *args, **kwargs):
         """Ensure metadata is a dict and fields are clean before saving."""
@@ -165,14 +149,44 @@ class CustomUser(AbstractUser):
         super().save(*args, **kwargs)
 
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    address_line1 = models.CharField(max_length=100, null=True, blank=True)
+    address_line2 = models.CharField(max_length=100, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    state = models.CharField(max_length=100, null=True, blank=True)
+    postal_code = models.CharField(max_length=20, null=True, blank=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
+    bio = models.TextField(null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.get_full_name()}'s Profile"
+
+    @property
+    def full_address(self):
+        """Returns the full address as a formatted string"""
+        parts = [
+            self.address_line1,
+            self.address_line2,
+            self.city,
+            self.state,
+            self.postal_code,
+            self.country
+        ]
+        return ', '.join(part for part in parts if part)
+
+
 class LookupCategory(BaseModel):
     """
-    Categories for lookup values (e.g., 'Status', 'ProjectType', 'ActivityType').
-    This helps organize and group lookup values.
+    Model for storing lookup categories (e.g., Status, Priority, etc.)
     """
     name = models.CharField(
         max_length=100,
-        unique=True,
         verbose_name=_('Name'),
         help_text=_('Name of the lookup category')
     )
@@ -180,17 +194,17 @@ class LookupCategory(BaseModel):
         max_length=50,
         unique=True,
         verbose_name=_('Code'),
-        help_text=_('Unique code for the category (e.g., STATUS, PROJ_TYPE)')
+        help_text=_('Unique code for the lookup category')
     )
     description = models.TextField(
         blank=True,
         verbose_name=_('Description'),
-        help_text=_('Description of what this category represents')
+        help_text=_('Optional description of the lookup category')
     )
     is_system = models.BooleanField(
         default=False,
         verbose_name=_('System Category'),
-        help_text=_('Whether this is a system-defined category that cannot be modified')
+        help_text=_('Whether this is a system-defined category')
     )
 
     class Meta:
@@ -205,6 +219,10 @@ class LookupCategory(BaseModel):
         self.code = self.code.upper()
         super().save(*args, **kwargs)
 
+    @property
+    def value_count(self):
+        return self.values.count()
+
 
 class LookupValue(BaseModel):
     """
@@ -216,55 +234,33 @@ class LookupValue(BaseModel):
         on_delete=models.PROTECT,
         related_name='values',
         verbose_name=_('Category'),
-        help_text=_('The category this lookup value belongs to')
+        help_text=_('The category this value belongs to')
     )
     name = models.CharField(
         max_length=100,
         verbose_name=_('Name'),
-        help_text=_('Display name of the lookup value')
+        help_text=_('Display name for this value')
     )
     code = models.CharField(
         max_length=50,
         verbose_name=_('Code'),
-        help_text=_('Unique code within the category (e.g., ACTIVE, IN_PROGRESS)')
+        help_text=_('Unique code within the category')
     )
     description = models.TextField(
         blank=True,
         verbose_name=_('Description'),
-        help_text=_('Description of what this value represents')
+        help_text=_('Optional description of what this value represents')
     )
     sort_order = models.PositiveIntegerField(
         default=0,
         verbose_name=_('Sort Order'),
-        help_text=_('Order in which values should be displayed')
-    )
-    color = models.CharField(
-        max_length=7,
-        blank=True,
-        verbose_name=_('Color'),
-        help_text=_('Optional hex color code (e.g., #FF0000)')
-    )
-    icon = models.CharField(
-        max_length=50,
-        blank=True,
-        verbose_name=_('Icon'),
-        help_text=_('Optional icon identifier')
-    )
-    is_default = models.BooleanField(
-        default=False,
-        verbose_name=_('Default Value'),
-        help_text=_('Whether this is the default value for its category')
-    )
-    is_system = models.BooleanField(
-        default=False,
-        verbose_name=_('System Value'),
-        help_text=_('Whether this is a system-defined value that cannot be modified')
+        help_text=_('Order in which to display this value')
     )
     parent = models.ForeignKey(
         'self',
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='children',
         verbose_name=_('Parent Value'),
         help_text=_('Optional parent value for hierarchical lookups')
@@ -275,22 +271,12 @@ class LookupValue(BaseModel):
         verbose_name_plural = _('Lookup Values')
         ordering = ['category', 'sort_order', 'name']
         unique_together = [('category', 'code')]
-        indexes = [
-            models.Index(fields=['category', 'code']),
-            models.Index(fields=['category', 'is_default']),
-        ]
 
     def __str__(self):
-        return f"{self.category.name} - {self.name}"
+        return f'{self.name} ({self.code})'
 
     def save(self, *args, **kwargs):
         self.code = self.code.upper()
-        if self.is_default:
-            # Ensure only one default value per category
-            LookupValue.objects.filter(
-                category=self.category,
-                is_default=True
-            ).exclude(pk=self.pk).update(is_default=False)
         super().save(*args, **kwargs)
 
 

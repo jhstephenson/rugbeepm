@@ -16,10 +16,10 @@
         <a href="{% url 'core:category-list' %}" class="btn btn-sm text-secondary" title="Back to List">
             <i class="fas fa-arrow-left"></i>
         </a>
-        <a href="{% url 'core:category-update' category.pk %}" class="btn btn-sm text-primary" title="Edit Category">
+        <a href="{% url 'core:category-update' category.id %}" class="btn btn-sm text-primary" title="Edit Category">
             <i class="fas fa-edit"></i>
         </a>
-        <a href="{% url 'core:category-delete' category.pk %}" class="btn btn-sm text-danger" title="Delete Category">
+        <a href="{% url 'core:category-delete' category.id %}" class="btn btn-sm text-danger" title="Delete Category">
             <i class="fas fa-trash"></i>
         </a>
     </div>
@@ -36,7 +36,7 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Values</h5>
-        <a href="{% url 'core:value-create' category.pk %}" class="btn btn-sm text-primary" title="Add Value">
+        <a href="{% url 'core:value-create' category.id %}" class="btn btn-sm text-primary" title="Add Value">
             <i class="fas fa-plus"></i>
         </a>
     </div>
@@ -53,7 +53,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for value in values %}
+                {% for value in category.values.all %}
                     <tr>
                         <td>{{ value.name }}</td>
                         <td><code>{{ value.code }}</code></td>
@@ -69,11 +69,11 @@
                             {% endif %}
                         </td>
                         <td class="text-end">
-                            <div class="d-flex gap-2 justify-content-end">
-                                <a href="{% url 'core:value-update' value.pk %}" class="btn btn-sm text-secondary" title="Edit Value">
+                            <div class="btn-group">
+                                <a href="{% url 'core:value-update' value.id %}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{% url 'core:value-delete' value.pk %}" class="btn btn-sm text-danger" title="Delete Value">
+                                <a href="{% url 'core:value-delete' value.id %}" class="btn btn-sm btn-outline-danger">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>
