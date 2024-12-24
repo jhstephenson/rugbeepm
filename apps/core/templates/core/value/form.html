@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Edit{% else %}New{% endif %} Value{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0">{% if object %}Edit{% else %}New{% endif %} Value</h1>
+        <div class="text-muted">{{ category.name }}</div>
+    </div>
+    <a href="{% url 'core:category-detail' category.pk %}" class="btn btn-sm text-secondary" title="Back to Category">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'core:category-detail' category.pk %}" class="btn btn-light">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
